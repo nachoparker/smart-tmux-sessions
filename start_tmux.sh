@@ -11,17 +11,17 @@
 #
 # Notes:
 #   It attaches to existing orphan tmux sessions upon exiting current tmux session
+
 function start_tmux()
 {
   test -z ${TMUX} || return                                          # fail if already in a TMUX session
   while true; do
-    tmux ls -F "#{session_id}:#{session_attached}" 2>/dev/null | \
-      while read l; do                                               # search for unused sessions
-        local  ID=$( echo $l | cut -f1 -d: )
-        local NUM=$( echo $l | cut -f2 -d: )
-        test "$NUM" != "0" || break;
-        ID=""
-      done
+    while read l; do                                                 # search for unused sessions
+      local  ID=$( echo $l | cut -f1 -d: )
+      local NUM=$( echo $l | cut -f2 -d: )
+      test "$NUM" == "0" && break;
+      ID=""
+    done < <( tmux ls -F "#{session_id}:#{session_attached}" 2>/dev/null )
     if [[ "$ID" != "" ]]; then                                       # use unused sessions, if they exist
       tmux attach -t $( echo $ID | sed 's=\$==' )
       local ID=""
