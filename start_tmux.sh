@@ -15,6 +15,7 @@
 function start_tmux()
 {
   test -z ${TMUX} || return                                          # fail if already in a TMUX session
+  [[ $- == *i* ]] || return                                          # only for interactive shells
   while true; do
     while read l; do                                                 # search for unused sessions
       local  ID=$( echo $l | cut -f1 -d: )
